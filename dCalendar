@@ -1,0 +1,23 @@
+let
+    DataMin = List.Min(Referencia_Tempo[Data]),
+    DataMax = List.Max(Referencia_Tempo[Data]),
+    QtdeDias = Duration.Days(DataMax - DataMin) + 1,
+    ListDatas = List.Dates(DataMin, QtdeDias, #duration(1, 0, 0, 0)),
+    #"Convertido para Tabela" = Table.FromList(ListDatas, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Nomear Coluna como Data" = Table.RenameColumns(#"Convertido para Tabela",{{"Column1", "Data"}}),
+    #"Alterar para Tipo Data" = Table.TransformColumnTypes(#"Nomear Coluna como Data",{{"Data", type date}}),
+    #"Ano" = Table.AddColumn(#"Alterar para Tipo Data", "Ano", each Date.Year([Data]), Int64.Type),
+    #"Mês" = Table.AddColumn(#"Ano", "Mês", each Date.Month([Data]), Int64.Type),
+    #"Nome do Mês" = Table.AddColumn(#"Mês", "Nome do Mês", each Date.MonthName([Data]), type text),
+    #"Trimestre" = Table.AddColumn(#"Nome do Mês", "Trimestre", each Date.QuarterOfYear([Data]), Int64.Type),
+    #"Quartil" = Table.AddColumn(#"Trimestre", "Quartil", each Text.Combine({"Q", Text.From([Trimestre], "pt-BR")}), type text),
+    #"QuartilAno" = Table.AddColumn(#"Quartil", "QuartilAno", each Text.Combine({Text.From([Ano], "pt-BR"), "Q", Text.From([Trimestre], "pt-BR")}), type text),
+    #"Criar Coluna MesAno" = Table.AddColumn(#"QuartilAno", "Personalizar", each Text.Combine({Text.Start(Text.Proper([Nome do Mês]), 3), "/", Text.From([Ano], "pt-BR")}), type text),
+    #"Nomear MesAno" = Table.RenameColumns(#"Criar Coluna MesAno",{{"Personalizar", "MêsAno"}}),
+    #"Numero Dia da Semana" = Table.AddColumn(#"Nomear MesAno", "Dia da Semana", each Date.DayOfWeek([Data]), Int64.Type),
+    #"Verificar se Dia Util" = Table.AddColumn(#"Numero Dia da Semana", "Dia Útil", each if[Dia da Semana]<6 and [Dia da Semana]>0 then 1 else 0),
+    #"Abrev. Nome Dia da Semana" = Table.AddColumn(#"Verificar se Dia Util", "Nome Dia da Semana", each Date.ToText([Data],"ddd")),
+    #"Semana do Ano" = Table.AddColumn(#"Abrev. Nome Dia da Semana", "Semana do Ano", each Date.WeekOfYear([Data]), Int64.Type),
+    #"Semana do Mês" = Table.AddColumn(#"Semana do Ano", "Semana do Mês", each Date.WeekOfMonth([Data]), Int64.Type)
+in
+    #"Semana do Mês"
