@@ -1,7 +1,0 @@
-TotalVendasReceita = SUM(Vendas[Receita])
-TotalUnidadesVendidas = SUM(Vendas[Quantidade])
-ReceitaDiaAnterior = CALCULATE([TotalVendasReceita],PREVIOUSDAY('dCalendar'[Data]))
-ReceitaMesmoDiaAnoAnterior = CALCULATE([TotalVendasReceita],SAMEPERIODLASTYEAR('dCalendar'[Data]))
-DiferençaReceitaDOD(Dia) = [TotalVendasReceita]-[ReceitaDiaAnterior]
-UnidadesVendidasDiaAnterior = CALCULATE([TotalUnidadesVendidas],PREVIOUSDAY('dCalendar'[Data]))
-UnidadesMesmoDiaAnoAnterior = CALCULATE([TotalUnidadesVendidas],SAMEPERIODLASTYEAR('dCalendar'[Data]))
