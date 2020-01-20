@@ -6,22 +6,29 @@ let
     #"Convertido para Tabela" = Table.FromList(ListDatas, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
     #"Nomear Coluna como Data" = Table.RenameColumns(#"Convertido para Tabela",{{"Column1", "Data"}}),
     #"Alterar para Tipo Data" = Table.TransformColumnTypes(#"Nomear Coluna como Data",{{"Data", type date}}),
-    #"Ano" = Table.AddColumn(#"Alterar para Tipo Data", "Ano", each Date.Year([Data]), Int64.Type),
-    #"Mês" = Table.AddColumn(#"Ano", "Mês", each Date.Month([Data]), Int64.Type),
-	#"Dia Inserido" = Table.AddColumn(#"Mês", "Dia", each Date.Day([Data]), Int64.Type),
-    #"Nome do Mês" = Table.AddColumn(#"Dia Inserido", "Nome do Mês", each Date.MonthName([Data]), type text),
-    #"Bimestre" = Table.AddColumn(#"Nome do Mês", "Bimestre", each Number.RoundUp([Mês]/2)),
-    #"Trimestre" = Table.AddColumn(#"Bimestre", "Trimestre", each Date.QuarterOfYear([Data]), Int64.Type),
-    #"Quartil" = Table.AddColumn(#"Trimestre", "Quartil", each Text.Combine({"Q", Text.From([Trimestre], "pt-BR")}), type text),
-    #"QuartilAno" = Table.AddColumn(#"Quartil", "QuartilAno", each Text.Combine({Text.From([Ano], "pt-BR"), "Q", Text.From([Trimestre], "pt-BR")}), type text),
-    #"Criar Coluna MesAno" = Table.AddColumn(#"QuartilAno", "Personalizar", each Text.Combine({Text.Start(Text.Proper([Nome do Mês]), 3), "/", Text.From([Ano], "pt-BR")}), type text),
-    #"Nomear MesAno" = Table.RenameColumns(#"Criar Coluna MesAno",{{"Personalizar", "MêsAno"}}),
-	#"AnoMes" = Table.AddColumn(#"Nomear MesAno", "AnoMes", each Text.Combine({Text.From([Ano], "pt-BR"), Text.PadStart(Text.From([Mês], "pt-BR"), 2, "0")}), type text),
-	#"Inserir DiaMes" = Table.AddColumn(#"AnoMes", "DiaMes", each Text.Combine({Text.From([Dia], "pt-BR"), "/", Text.Start(Text.Proper([Nome do Mês]), 3)}), type text),
-    #"Numero Dia da Semana" = Table.AddColumn(#"Inserir DiaMes", "Dia da Semana", each Date.DayOfWeek([Data]), Int64.Type),
+    #"Data Resumo" = Table.AddColumn(#"Alterar para Tipo Data", "DataResumo", each Text.Combine({Date.ToText([Data], "dd"), "/", Text.Proper(Date.ToText([Data], "MMM")), Text.Middle(Date.ToText([Data], "yyyy"), 2)}), type text),
+    #"Dia Inserido" = Table.AddColumn(#"Data Resumo", "Dia", each Date.Day([Data]), Int64.Type),
+    #"Numero Dia da Semana" = Table.AddColumn(#"Dia Inserido", "Dia da Semana", each Date.DayOfWeek([Data]), Int64.Type),
     #"Verificar se Dia Util" = Table.AddColumn(#"Numero Dia da Semana", "Dia Útil", each if[Dia da Semana]<6 and [Dia da Semana]>0 then 1 else 0),
     #"Abrev. Nome Dia da Semana" = Table.AddColumn(#"Verificar se Dia Util", "Nome Dia da Semana", each Date.ToText([Data],"ddd")),
     #"Semana do Ano" = Table.AddColumn(#"Abrev. Nome Dia da Semana", "Semana do Ano", each Date.WeekOfYear([Data]), Int64.Type),
     #"Semana do Mês" = Table.AddColumn(#"Semana do Ano", "Semana do Mês", each Date.WeekOfMonth([Data]), Int64.Type)
+    #"Mês" = Table.AddColumn(#"Semana do Mês", "Mês", each Date.Month([Data]), Int64.Type),
+    #"Nome do Mês" = Table.AddColumn(#"Mês", "Nome do Mês", each Date.MonthName([Data]), type text),
+    #"Inserir DiaMes" = Table.AddColumn(#"Nome do Mês", "DiaMes", each Text.Combine({Text.From([Dia], "pt-BR"), "/", Text.Start(Text.Proper([Nome do Mês]), 3)}), type text),
+    #"Ano" = Table.AddColumn(#"Inserir DiaMes", "Ano", each Date.Year([Data]), Int64.Type),
+    #"MesAno" = Table.AddColumn(#"Ano", "MesAno", each Text.Combine({Text.Start(Text.Proper([Nome do Mês]), 3), "/", Text.From([Ano], "pt-BR")}), type text),
+    #"AnoMes" = Table.AddColumn(#"MesAno", "AnoMes", each Text.Combine({Text.From([Ano], "pt-BR"), Text.PadStart(Text.From([Mês], "pt-BR"), 2, "0")}), type text),
+    #"AnoMesDia" = Table.AddColumn(#"AnoMes", "AnoMesDia", each Text.Combine({Date.ToText([Data], "yyyy"), "08", Date.ToText([Data], "dd")}), type text),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"AnoMesDia",{{"AnoMesDia", Int64.Type}}),
+    #"Bimestre" = Table.AddColumn(#"Tipo Alterado", "Bimestre", each Number.RoundUp([Mês]/2)),
+    #"Trimestre" = Table.AddColumn(#"Bimestre", "Trimestre", each Date.QuarterOfYear([Data]), Int64.Type),
+    #"Bimestre/Ano" = Table.AddColumn(#"Trimestre", "Bimestre/Ano", each Text.Combine({Text.From([Bimestre], "pt-BR"), "/Bim ", Text.From([Ano], "pt-BR")}), type text),
+    #"Trimestre/Ano" = Table.AddColumn(#"Bimestre/Ano", "Trimestre/Ano", each Text.Combine({Text.From([Trimestre], "pt-BR"), "/Trim ", Text.From([Ano], "pt-BR")}), type text),
+    #"Quartil" = Table.AddColumn(#"Trimestre/Ano", "Quartil", each Text.Combine({"Q", Text.From([Trimestre], "pt-BR")}), type text),
+    #"QuartilAno" = Table.AddColumn(#"Quartil", "QuartilAno", each Text.Combine({Text.From([Ano], "pt-BR"), "Q", Text.From([Trimestre], "pt-BR")}), type text)
+           
 in
-    #"Semana do Mês"
+    #"QuartilAno"
+
+  
