@@ -12,7 +12,7 @@ let
     #"Verificar se Dia Util" = Table.AddColumn(#"Numero Dia da Semana", "Dia Útil", each if[Dia da Semana]<6 and [Dia da Semana]>0 then 1 else 0),
     #"Abrev. Nome Dia da Semana" = Table.AddColumn(#"Verificar se Dia Util", "Nome Dia da Semana", each Date.ToText([Data],"ddd")),
     #"Semana do Ano" = Table.AddColumn(#"Abrev. Nome Dia da Semana", "Semana do Ano", each Date.WeekOfYear([Data]), Int64.Type),
-    #"Semana do Mês" = Table.AddColumn(#"Semana do Ano", "Semana do Mês", each Date.WeekOfMonth([Data]), Int64.Type)
+    #"Semana do Mês" = Table.AddColumn(#"Semana do Ano", "Semana do Mês", each Date.WeekOfMonth([Data]), Int64.Type),
     #"Mês" = Table.AddColumn(#"Semana do Mês", "Mês", each Date.Month([Data]), Int64.Type),
     #"Nome do Mês" = Table.AddColumn(#"Mês", "Nome do Mês", each Date.MonthName([Data]), type text),
     #"Inserir DiaMes" = Table.AddColumn(#"Nome do Mês", "DiaMes", each Text.Combine({Text.From([Dia], "pt-BR"), "/", Text.Start(Text.Proper([Nome do Mês]), 3)}), type text),
