@@ -19,7 +19,7 @@ let
     #"Ano" = Table.AddColumn(#"Inserir DiaMes", "Ano", each Date.Year([Data]), Int64.Type),
     #"MesAno" = Table.AddColumn(#"Ano", "MesAno", each Text.Combine({Text.Start(Text.Proper([Nome do Mês]), 3), "/", Text.From([Ano], "pt-BR")}), type text),
     #"AnoMes" = Table.AddColumn(#"MesAno", "AnoMes", each Text.Combine({Text.From([Ano], "pt-BR"), Text.PadStart(Text.From([Mês], "pt-BR"), 2, "0")}), type text),
-    #"AnoMesDia" = Table.AddColumn(#"AnoMes", "AnoMesDia", each Text.Combine({Date.ToText([Data], "yyyy"), "08", Date.ToText([Data], "dd")}), type text),
+    #"AnoMesDia" = Table.AddColumn(#"AnoMes", "AnoMesDia", each Text.Combine({Date.ToText([Data], "yyyy"), Date.ToText([Data], "MM"), Date.ToText([Data], "dd")}), type text),
     #"MesDia" = Table.AddColumn(AnoMesDia, "MesDia", each Text.AfterDelimiter(Text.From([AnoMesDia], "pt-BR"), "2", 2), type text),
     #"Tipo Alterado" = Table.TransformColumnTypes(#"MesDia",{{"AnoMesDia", Int64.Type}}),
     #"Bimestre" = Table.AddColumn(#"Tipo Alterado", "Bimestre", each Number.RoundUp([Mês]/2)),
