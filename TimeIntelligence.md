@@ -28,7 +28,7 @@ Métrica_WTD_YOY_Variação = DIVIDE([Métrica_WTD_YOY_Diferença],[Métrica_Mes
 ```
 
 ## Mês
-### Legenda das Siglas: Month To Date (MTD); Month Over Month (WOW); Year Over Year (YOY)
+### Legenda das Siglas: Month To Date (MTD); Month Over Month (MOM); Year Over Year (YOY)
 ```dax
 Métrica_MTD = TOTALMTD([TotalMétrica],'dCalendario'[Data])
 Métrica_MesmoMesAnoAnterior = CALCULATE([Métrica_MTD],SAMEPERIODLASTYEAR('dCalendario'[Data]))
