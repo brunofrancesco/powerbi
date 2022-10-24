@@ -1,1 +1,1 @@
-# Power Bi Script M Language n' DAX
+# Power Bi Scripts M Language
