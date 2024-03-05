@@ -1,0 +1,49 @@
+Vamos destrinchar o código e explicar cada função usada:
+
+1 - Variáveis (VAR): As variáveis são usadas para armazenar os resultados intermediários. Isso não apenas torna o código mais limpo e fácil de ler, mas também melhora o desempenho ao evitar cálculos repetidos.
+2 - INT: Esta função arredonda um número para baixo para o inteiro mais próximo. É usada aqui para calcular o total de horas e minutos inteiros a partir dos segundos totais.
+3 - MOD: Esta função retorna o resto de uma divisão. É utilizada para calcular os minutos restantes depois de converter alguns segundos em horas, e também para calcular os segundos restantes após a remoção das horas e minutos.
+4 - ROUNDUP: Esta função arredonda um número para cima até o inteiro mais próximo. Aqui, é usada para garantir que os segundos sejam um número inteiro, mesmo que o cálculo original possa ter resultado em um número decimal.
+5 - LEN: Retorna o número de caracteres em uma string. É usada para verificar se o número de horas, minutos ou segundos é de um único dígito.
+6 - CONCATENATE: Combina duas ou mais strings em uma. No contexto deste código, é usada para adicionar zeros à frente dos números de um dígito para horas, minutos e segundos, garantindo o formato hh:mm:ss.
+7 - IF: Avalia uma condição e retorna um valor se a condição for verdadeira, e outro valor se for falsa. Neste caso, é usada para determinar se um zero deve ser adicionado à frente dos números de um dígito para horas, minutos e segundos.
+8 - RETURN: Especifica o valor retornado pela medida. Aqui, concatena as horas, minutos e segundos calculados em um formato hh:mm:ss.
+
+Duração = 
+VAR Duração = tabela[segundos] //Aqui a tabela com a coluna onde tem os segundos
+// Existem 3.600 segundos em uma hora
+VAR Horas =
+    INT ( Duração / 3600)
+// Existem 60 segundos em um minuto
+VAR Minutos =
+    INT ( MOD( Duração - ( Horas * 3600 ), 3600 ) / 60)
+// Os segundos restantes são o resto dos segundos divididos por 60 após subtrair as horas
+VAR Segundos =
+    ROUNDUP(MOD ( MOD( Duração - ( Horas * 3600 ), 3600 ), 60 ), 0) // Arredondamos aqui para obter um número inteiro
+// Estas variáveis intermediárias garantem que tenhamos zeros à esquerda concatenados em dígitos únicos
+// Horas com zeros à esquerda
+VAR H =
+    IF ( LEN ( Horas ) = 1, 
+        CONCATENATE ( "0", Horas ),
+        CONCATENATE ( "", Horas )
+      )
+// Minutos com zeros à esquerda
+VAR M =
+    IF (
+        LEN ( Minutos ) = 1,
+        CONCATENATE ( "0", Minutos ),
+        CONCATENATE ( "", Minutos )
+    )
+// Segundos com zeros à esquerda
+VAR S =
+    IF (
+        LEN ( Segundos ) = 1,
+        CONCATENATE ( "0", Segundos ),
+        CONCATENATE ( "", Segundos )
+    )
+// Agora retorna horas, minutos e segundos com zeros à esquerda no formato correto "hh:mm:ss"
+RETURN
+    CONCATENATE (
+        H,
+        CONCATENATE ( ":", CONCATENATE ( M, CONCATENATE ( ":", S ) ) )
+    )
